@@ -1,0 +1,45 @@
+name: Deploy to Stormkit NAS
+
+on:
+  push:
+    branches:
+      - main # deploys whenever you push to main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout your repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up Node
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: "npm"
+
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4️⃣ Build your app
+      - name: Build app
+        run: npm run build
+
+      # 5️⃣ Package the app
+      - name: Package app
+        run: tar -czf app.tar.gz . # Creates a tarball of the repo
+
+      # 6️⃣ Deploy to Stormkit NAS
+      - name: Deploy to Stormkit
+        env:
+          STORMKIT_API_URL: ${{ secrets.STORMKIT_API_URL }}
+          STORMKIT_APP_SECRET: ${{ secrets.STORMKIT_APP_SECRET }}
+        run: |
+          echo "Deploying app to Stormkit NAS..."
+          curl -X POST "https://api.stormkit.igandhi.com/app/deploy" \
+               -H "Authorization: Bearer $STORMKIT_APP_SECRET" \
+               -F "repository=@app.tar.gz"
