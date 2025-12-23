@@ -31,10 +31,7 @@ jobs:
 
       # 5️⃣ Package the app
       - name: Package app
-        run: tar -czf app.tar.gz . \
-          --exclude='./node_modules' \
-          --exclude='./.git' \
-          --exclude='./app.tar.gz'
+        run: tar -czf app.tar.gz . --exclude=node_modules --exclude=.git --exclude=app.tar.gz
 
       # 6️⃣ Deploy to Stormkit NAS
       - name: Deploy to Stormkit
